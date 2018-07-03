@@ -29,6 +29,8 @@ class DMU65UL_Post:
                 prev_was_rapid = True
             elif line.startswith('FEDRAT/IPM,'):
                 print('G1 F{}'.format(line.split(',')[1]), file=outputf)
+            elif line.startswith('FEDRAT/'):
+                print('G1 F{}'.format(line.split('/')[1]), file=outputf)
             elif line.startswith('GOTO/'):
                 values = line[len('GOTO/'):].split(',')
                 value_count = len(values)
