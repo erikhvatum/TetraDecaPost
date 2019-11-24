@@ -1,6 +1,6 @@
-# (C) Erik Hvatum, Arcterik LLC 2018. All rights reserved.
+# (C) Erik Hvatum, Arcterik LLC 2018-2019. All rights reserved.
 
-"""PyTetraDecaPost (C) Erik Hvatum, Arcterik LLC 2018. All rights reserved.
+"""PyTetraDecaPost (C) Erik Hvatum, Arcterik LLC 2018-2019. All rights reserved.
 
 Testing, verification, and rapid development Python implementation of TetraDecaPost. Primary/official
 implementation, named simply "TetraDecaPost", is C++.
@@ -21,11 +21,12 @@ class DMU65UL_Post:
             line = line.strip()
             # print(' <= ', line)
             line_num += 1
-            if line.startswith('TOOL PATH/'):
-                match = re.match('''TOOL PATH/(.*),TOOL,(.*)''', line)
-                assert match is not None
-                print('T"{}"\nM6\nTRAORI\n'.format(match.group(2)), file=outputf)
-            elif line == 'RAPID':
+#           if line.startswith('TOOL PATH/'):
+#               match = re.match('''TOOL PATH/(.*),TOOL,(.*)''', line)
+#               assert match is not None
+#               print('T"{}"\nM6\nTRAORI\n'.format(match.group(2)), file=outputf)
+#           elif line == 'RAPID':
+            if line == 'RAPID':
                 prev_was_rapid = True
             elif line.startswith('FEDRAT/IPM,'):
                 print('G1 F{}'.format(line.split(',')[1]), file=outputf)
