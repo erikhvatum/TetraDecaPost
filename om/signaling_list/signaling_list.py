@@ -27,7 +27,7 @@ from collections.abc import MutableSequence
 from PyQt5 import Qt
 import textwrap
 
-class _QtAbcMeta(Qt.pyqtWrapperType, ABCMeta):
+class _QtAbcMeta(type(Qt.QObject), ABCMeta):
     pass
 
 class SignalingList(Qt.QObject, MutableSequence, metaclass=_QtAbcMeta):

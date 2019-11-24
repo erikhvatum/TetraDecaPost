@@ -23,7 +23,7 @@
 # Authors: Erik Hvatum <ice.rikh@gmail.com>
 
 from PyQt5 import Qt
-from ...shared_resources import SPECIAL_SELECTION_HIGHLIGHT_QITEMDATA_ROLE
+#from ...shared_resources import SPECIAL_SELECTION_HIGHLIGHT_QITEMDATA_ROLE
 
 class RecursivePropertyTableModel(Qt.QAbstractTableModel):
     """RecursivePropertyTableModel: Glue for making a Qt.TableView (or similar) in which the elements
@@ -129,9 +129,9 @@ class RecursivePropertyTableModel(Qt.QAbstractTableModel):
             elif role == Qt.Qt.BackgroundRole:
                 if not self._property_inst_tree_root.children[self.signaling_list[midx.row()]].path_exists(self.property_paths[midx.column()]):
                     return Qt.QVariant(Qt.QApplication.instance().palette().brush(Qt.QPalette.Disabled, Qt.QPalette.Dark))
-            elif role == SPECIAL_SELECTION_HIGHLIGHT_QITEMDATA_ROLE:
-                if not self._property_inst_tree_root.children[self.signaling_list[midx.row()]].path_exists(self.property_paths[midx.column()]):
-                    return Qt.QVariant(Qt.QApplication.instance().palette().brush(Qt.QPalette.Disabled, Qt.QPalette.Mid))
+            #elif role == SPECIAL_SELECTION_HIGHLIGHT_QITEMDATA_ROLE:
+            #    if not self._property_inst_tree_root.children[self.signaling_list[midx.row()]].path_exists(self.property_paths[midx.column()]):
+            #        return Qt.QVariant(Qt.QApplication.instance().palette().brush(Qt.QPalette.Disabled, Qt.QPalette.Mid))
         return Qt.QVariant()
 
     def set_cell(self, row, column, value):

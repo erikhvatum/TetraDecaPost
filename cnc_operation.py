@@ -1,4 +1,6 @@
 from .cnc_param import CncParam
 
 class CncOperation:
-    pass
+    def __init__(self, mcs_idx):
+        self.mcs_idx = mcs_idx
+        self.commands = []
