@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# (C) Erik Hvatum 2019
+
 
 from PyQt5 import Qt
 import sys

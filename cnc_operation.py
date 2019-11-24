@@ -1,3 +1,5 @@
+# (C) Erik Hvatum 2019
+
 from .cnc_param import CncParam
 
 class CncOperation:
