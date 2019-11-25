@@ -6,6 +6,7 @@ from . import om
 from pathlib import Path
 import re
 from .cnc_program import CncProgram
+from .progress_thread_dlg import ProgressThreadDlg
 
 class NxPostOutputAdjuster(Qt.QMainWindow):
     def __init__(self, parent=None):
@@ -31,8 +32,10 @@ class NxPostOutputAdjuster(Qt.QMainWindow):
     def transform_file(self, fpath):
         cnc_program = CncProgram()
         cnc_program.import_mpf(fpath)
-        cnc_program.transform_for_dmu65ul()
-        cnc_program.export_mpf(fpath.parent / (fpath.stem + '_.mpf'))
+        pt_dlg = ProgressThreadDlg(cnc_program.transform_for_dmu65ul, self)
+        pt_dlg.exec()
+        if pt_dlg._worker.completed:
+            cnc_program.export_mpf(fpath.parent / (fpath.stem + '_.mpf'))
 
 if __name__ == '__main__':
     app = Qt.QApplication(sys.argv)

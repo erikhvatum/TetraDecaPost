@@ -31,3 +31,14 @@ class CncCommand:
         r.words = line.split()
 
         return ret
+
+    @property
+    def mpf_line(self):
+        line = ' '.join(self.words)
+        if self.comment != '':
+            line += ' ' + self.comment
+        return line
+
+    @property
+    def nc(self):
+        return ' '.join(self.words)
