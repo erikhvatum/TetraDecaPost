@@ -33,7 +33,8 @@ class CncProgram:
             'SUPA Z=_Z_HOME D0',
             'SUPA X=_X_HOME Y=_Y_HOME A=_A_HOME C=_C_HOME D1']
         replace_lines = {
-            'CYCLE832(_camtolerance,0,1)' : 'CYCLE832(_camtolerance,_SEMIFIN,1)'}
+#           'CYCLE832(_camtolerance,0,1)' : 'CYCLE832(_camtolerance,_SEMIFIN,1)'
+            }
         idx = -1
         yield 0.0
         try:
@@ -48,17 +49,58 @@ class CncProgram:
                 if in_nc in skip_lines:
                     continue
                 if in_nc in replace_lines:
-                    out_cmd = CncCommand()
-                    out_cmd.words = [replace_lines[in_nc]]
-                    ncmds.append(out_cmd)
+                    ncmds.append(CncCommand(words=[replace_lines[in_nc]]))
                     continue
-                if in_cmd.mpf_line == 'DEF REAL _camtolerance':
-                    if not seen_camtol_def:
-                        ncmds.append(in_cmd)
-                        seen_camtol_def = True
+                match = re.match(r'(T="[^"]+"|T0|T=0) M6', in_nc)
+                if match:
+                    ncmds.append(CncCommand(words=[match.group(1)]))
+                    ncmds.append(CncCommand(words=['M6']))
                     continue
-                ncmds.append(in_cmd)
-        except:
+                if in_nc == 'DEF REAL _camtolerance':
+                    if seen_camtol_def:
+                        continue
+                    seen_camtol_def = True
+                    continue #!!!!!!!!!!
+                elif in_nc.startswith('_camtolerance='):#!!!!!!!!!!
+                    continue#!!!!!!!!!!
+                elif in_nc.startswith('ORIRESET') and len(self.commands)-idx >= 6:
+                    if self.commands[idx+1].nc == 'CYCLE832(_camtolerance,0,1)' and \
+                      self.commands[idx+2].nc == 'COMPOF' and \
+                      re.match(r'G5[456789]', self.commands[idx+3].nc) and \
+                      self.commands[idx+4].nc == 'TRAORI' and \
+                      'G0' in self.commands[idx+5].words:
+                        match = re.match(r'ORIRESET\(([^,]+),([^,]+)\)', in_nc)
+                        a, c = float(match.group(1)), float(match.group(2))
+                        if a < 0:
+                            a *= -1
+                            c *= -1
+                        params = {v[0] : v for v in self.commands[idx+5].words if v != 'G0'}
+                        ncmds.append(CncCommand(['HOMEY']))
+                        ncmds.append(CncCommand([self.commands[idx+3].nc]))
+                        ncmds.append(CncCommand(['G0', f'A{a}', f'C{c}']))
+                        ncmds.extend(CncCommand([v]) for v in ('G642', 'COMPCURV', 'FFWON', 'SOFT', 'CYCLE832(.002,_SEMIFIN,1)', 'TRAORI'))
+                        ncmds.append(CncCommand(self.commands[idx+5].words + ['M8'], self.commands[idx+5].comment))
+                        idx += 5
+                        continue
+                elif in_nc == 'CYCLE832(_camtolerance,0,1)' and len(self.commands)-idx >= 3:
+                    if self.commands[idx+1].nc == 'COMPOF' and re.match(r'G5[456789]', self.commands[idx+2].nc):
+                        ncmds.extend(CncCommand([v]) for v in ('HOMEY', self.commands[idx+2].nc, 'G642', 'COMPCURV',
+                                                               'FFWON', 'SOFT', 'CYCLE832(.002,_SEMIFIN,1)'))
+                        idx += 2
+                        continue
+                elif 'M3' in in_cmd.words or 'M4' in in_cmd.words:
+                    ncmds.append(CncCommand(in_cmd.words + ['M8'], in_cmd.comment))
+                    continue
+                elif in_cmd.nc == 'M5':
+                    ncmds.append(CncCommand(['M9']))
+                    ncmds.append(CncCommand(['M5'], in_cmd.comment))
+                    continue
+                ncmds.append(CncCommand(list(in_cmd.words), in_cmd.comment))
+        except Exception as e:
+            print(e, sys.stderr)
             raise
+        if ncmds:
+            if ncmds[-1].nc == 'M30':
+                ncmds.insert(-1, CncCommand(['HDSPIN']))
         self.commands = ncmds
         yield 1.0
