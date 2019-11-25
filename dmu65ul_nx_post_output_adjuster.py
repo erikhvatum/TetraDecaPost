@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
-# (C) Erik Hvatum 2019
-
+# Copyright (c) 2019 by Erik Hvatum
 
 from PyQt5 import Qt
 import sys
 from . import om
 from pathlib import Path
+import re
 from .cnc_program import CncProgram
 
 class NxPostOutputAdjuster(Qt.QMainWindow):
@@ -25,7 +24,7 @@ class NxPostOutputAdjuster(Qt.QMainWindow):
         md = event.mimeData()
         if md.hasUrls():
             for url in md.urls():
-                fpath = Path(url.path())
+                fpath = Path(url.toLocalFile())
                 if fpath.exists():
                     self.transform_file(fpath)
 

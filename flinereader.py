@@ -1,4 +1,4 @@
-# (C) Erik Hvatum 2019
+# Copyright (c) 2019 by Erik Hvatum
 
 def flinereader(fpath):
     '''flinereader is a generator function that yields the content of the file specified by fpath,

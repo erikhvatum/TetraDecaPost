@@ -1,12 +1,11 @@
-# (C) Erik Hvatum 2019
+# Copyright (c) 2019 by Erik Hvatum
 
 import attr
 
 @attr.s
 class CncMachineState:
-    machine_name = attr.ib()
     feed_rate = attr.ib(init=False, default=None)
-    workpiece_home_idx = attr.ib(init=False, default=None)
+    workpiece_home_id = attr.ib(init=False, default=None)
     cycle800 = attr.ib(init=False, default=None)
     cycle832 = attr.ib(init=False, default=None)
     traori = attr.ib(init=False, default=None)
@@ -14,3 +13,4 @@ class CncMachineState:
     spindle_idx = attr.ib(init=False, default=None)
     tool = attr.ib(init=False, default=None)
     next_tool = attr.ib(init=False, default=None)
+    sticky = attr.ib(init=False, default=None)

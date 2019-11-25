@@ -1,4 +1,4 @@
-# (C) Erik Hvatum 2019
+# Copyright (c) 2019 by Erik Hvatum
 
 import attr
 

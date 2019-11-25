@@ -1,32 +1,33 @@
-# (C) Erik Hvatum 2019
+# Copyright (c) 2019 by Erik Hvatum
 
-from enum import Enum
+import attr
+import re
+from .cnc_param import CncParam
 
-class CncCommandCode(Enum):
-    BLANK_LINE = auto()
-    ASSIGNMENT = auto()
-    RAPID = auto()
-    FEED = auto()
-    CW_ARC = auto()
-    CCW_ARC = auto()
-    HOMEY = auto()
-    HDSPIN = auto()
-    EXT_COOLANT = auto()
-    INT_COOLANT = auto()
-    CYCLE800 = auto()
-    CYCLE832 = auto()
-    SET_HOME_IDX = auto()
-    TRAORI = auto()
-    TRAFOOF = auto()
-    MSG = auto()
-    SET_TOOL = auto()
-    SWITCH_TOOL = auto()
-    OTHER = auto()
-
+@attr.s
 class CncCommand:
-    def __init__(self, cmd_code=None, cmd_str=None, params=None, comment=None, sticky=False):
-        self.cmd_code = cmd_code
-        self.cmd_str = cmd_str
-        self.params = params
-        self.comment = comment
-        self.sticky = 
+    words = attr.ib(default=attr.Factory(list))
+    comment = attr.ib(default='')
+
+    @classmethod
+    def from_mpf_line(cls, line, cms):
+        r = cls()
+        ret = [r]
+        # Strip line number
+        m = re.search(r'^\s*N\d+\s*', line)
+        if m is not None:
+            line = line[m.span()[1]:]
+
+        # Pull out trailing comment
+        c_idx = line.find(';')
+        if c_idx != -1:
+            r.comment = line[c_idx:].rstrip()
+            line = line[:c_idx]
+
+        # Remove any leading or trailing whitespace
+        line = line.strip()
+
+        # We don't yet need to handle quote or paren sections correctly
+        r.words = line.split()
+
+        return ret
