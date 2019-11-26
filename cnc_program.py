@@ -76,17 +76,31 @@ class CncProgram:
                             c *= -1
                         params = {v[0] : v for v in self.commands[idx+5].words if v != 'G0'}
                         ncmds.append(CncCommand(['HOMEY']))
+                        ncmds.append(CncCommand(['M1']))
                         ncmds.append(CncCommand([self.commands[idx+3].nc]))
                         ncmds.append(CncCommand(['G0', f'A{a}', f'C{c}']))
                         ncmds.extend(CncCommand([v]) for v in ('G642', 'COMPCURV', 'FFWON', 'SOFT', 'CYCLE832(.002,_SEMIFIN,1)', 'TRAORI'))
                         ncmds.append(CncCommand(self.commands[idx+5].words + ['M8'], self.commands[idx+5].comment))
                         idx += 5
                         continue
+                    else:
+                        match = re.match(r'ORIRESET\(([^,]+),([^,]+)\)', in_nc)
+                        a, c = float(match.group(1)), float(match.group(2))
+                        if a < 0:
+                            a *= -1
+                            c *= -1
+                        ncmds.append(CncCommand(['HOMEY']))
+                        ncmds.append(CncCommand(['M1']))
+                        ncmds.append(CncCommand(['G0', f'A{a}', f'C{c}']))
+                        continue
                 elif in_nc == 'CYCLE832(_camtolerance,0,1)' and len(self.commands)-idx >= 3:
                     if self.commands[idx+1].nc == 'COMPOF' and re.match(r'G5[456789]', self.commands[idx+2].nc):
-                        ncmds.extend(CncCommand([v]) for v in ('HOMEY', self.commands[idx+2].nc, 'G642', 'COMPCURV',
+                        ncmds.extend(CncCommand([v]) for v in ('HOMEY', 'M1', self.commands[idx+2].nc, 'G642', 'COMPCURV',
                                                                'FFWON', 'SOFT', 'CYCLE832(.002,_SEMIFIN,1)'))
                         idx += 2
+                        continue
+                    else:
+                        ncmds.append(CncCommand(['CYCLE832(.002,_SEMIFIN,1)']))
                         continue
                 elif 'M3' in in_cmd.words or 'M4' in in_cmd.words:
                     ncmds.append(CncCommand(in_cmd.words + ['M8'], in_cmd.comment))
