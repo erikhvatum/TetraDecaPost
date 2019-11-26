@@ -109,6 +109,8 @@ class CncProgram:
                     ncmds.append(CncCommand(['M9']))
                     ncmds.append(CncCommand(['M5'], in_cmd.comment))
                     continue
+                elif in_cmd.nc == 'COMPOF':
+                    continue
                 ncmds.append(CncCommand(list(in_cmd.words), in_cmd.comment))
         except Exception as e:
             print(e, sys.stderr)
