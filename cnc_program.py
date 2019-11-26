@@ -73,7 +73,7 @@ class CncProgram:
                         a, c = float(match.group(1)), float(match.group(2))
                         if a < 0:
                             a *= -1
-                            c *= -1
+                            c += 180
                         params = {v[0] : v for v in self.commands[idx+5].words if v != 'G0'}
                         ncmds.append(CncCommand(['HOMEY']))
                         ncmds.append(CncCommand(['M1']))
@@ -88,7 +88,7 @@ class CncProgram:
                         a, c = float(match.group(1)), float(match.group(2))
                         if a < 0:
                             a *= -1
-                            c *= -1
+                            c += 180
                         ncmds.append(CncCommand(['HOMEY']))
                         ncmds.append(CncCommand(['M1']))
                         ncmds.append(CncCommand(['G0', f'A{a}', f'C{c}']))
@@ -100,7 +100,7 @@ class CncProgram:
                         idx += 2
                         continue
                     else:
-                        ncmds.append(CncCommand(['CYCLE832(.002,_SEMIFIN,1)']))
+                        ncmds.extend(CncCommand([v]) for v in ('G642', 'COMPCURV', 'FFWON', 'SOFT', 'CYCLE832(.002,_SEMIFIN,1)'))
                         continue
                 elif 'M3' in in_cmd.words or 'M4' in in_cmd.words:
                     ncmds.append(CncCommand(in_cmd.words + ['M8'], in_cmd.comment))
