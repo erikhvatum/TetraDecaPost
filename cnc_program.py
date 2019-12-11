@@ -20,6 +20,21 @@ class CncProgram:
             for n, cmd in enumerate(self.commands):
                 print(f'N{n}', cmd.mpf_line, file=out)
 
+    def apply_tool_preloading(self):
+        idx = 0
+        while idx < len(self.commands):
+            if self.commands[idx].nc == 'M6':
+                for ts_idx in range(idx+1, len(self.commands)):
+                    nc = self.commands[ts_idx].nc
+                    if nc.startswith('T=') or nc == 'T0':
+                        break
+                else:
+                    break
+                self.commands.insert(idx+1, self.commands.pop(ts_idx))
+                idx = ts_idx
+            else:
+                idx += 1
+
     def transform_for_dmu65ul(self):
         tool = None
         next_tool = None
@@ -31,7 +46,10 @@ class CncProgram:
             '_A_HOME=0 _C_HOME=0',
             'SUPA G0 Z=_Z_HOME D0',
             'SUPA Z=_Z_HOME D0',
-            'SUPA X=_X_HOME Y=_Y_HOME A=_A_HOME C=_C_HOME D1']
+            'SUPA X=_X_HOME Y=_Y_HOME A=_A_HOME C=_C_HOME D1',
+            'SUPA X=_X_HOME Y=_Y_HOME A=_A_HOME C=_C_HOME',
+            'SUPA Z=_Z_HOME'
+        ]
         replace_lines = {
 #           'CYCLE832(_camtolerance,0,1)' : 'CYCLE832(_camtolerance,_SEMIFIN,1)'
             }

@@ -14,7 +14,6 @@ class NxPostOutputAdjuster(Qt.QMainWindow):
         self.setWindowTitle('DMU65 NX Post Output Adjuster')
         self.setAcceptDrops(True)
         self._cnc_program = None
-        self.transform_file(Path(r'Z:\wix\Arcterik\Projects\tobacco_related\on_dovetail_.mpf')) #!!!!!!!!!!!!!!
 
     def dragEnterEvent(self, event):
         event.acceptProposedAction()
@@ -36,9 +35,15 @@ class NxPostOutputAdjuster(Qt.QMainWindow):
         pt_dlg = ProgressThreadDlg(cnc_program.transform_for_dmu65ul, self)
         pt_dlg.exec()
         if pt_dlg._worker.completed:
-            #cnc_program.export_mpf(fpath.parent / (fpath.stem + '_.mpf')) #!!!!!!!!!!!!!!!!!
-            cnc_program.export_mpf(Path(r'Z:\wix\Arcterik\Projects\tobacco_related\on_dovetail.mpf'))
-            self.deleteLater() #!!!!!!!!
+            cnc_program.apply_tool_preloading()
+            outfn = fpath.name
+            # outfn = fpath.stem
+            # if outfn[-1] == '_':
+            #     outfn = outfn[:-1]
+            # else:
+            #     outfn = outfn + '_'
+            # outfn += '.mpf'
+            cnc_program.export_mpf(fpath.parent / outfn)
 
 if __name__ == '__main__':
     app = Qt.QApplication(sys.argv)
