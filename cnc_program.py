@@ -73,6 +73,7 @@ class CncProgram:
                 if match:
                     ncmds.append(CncCommand(words=[match.group(1)]))
                     ncmds.append(CncCommand(words=['M6']))
+                    ncmds.append(CncCommand(words=['M11']))
                     continue
                 if in_nc == 'DEF REAL _camtolerance':
                     if seen_camtol_def:
