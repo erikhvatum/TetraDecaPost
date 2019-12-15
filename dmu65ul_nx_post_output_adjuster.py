@@ -43,6 +43,7 @@ class NxPostOutputAdjuster(Qt.QMainWindow):
             # else:
             #     outfn = outfn + '_'
             # outfn += '.mpf'
+            cnc_program.pattern_ops_across_homes(3)
             cnc_program.export_mpf(fpath.parent / outfn)
 
 if __name__ == '__main__':

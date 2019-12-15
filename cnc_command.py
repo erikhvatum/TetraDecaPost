@@ -42,3 +42,6 @@ class CncCommand:
     @property
     def nc(self):
         return ' '.join(self.words)
+
+    def copy(self):
+        return CncCommand(self.words.copy(), self.comment)

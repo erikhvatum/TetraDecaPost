@@ -35,6 +35,27 @@ class CncProgram:
             else:
                 idx += 1
 
+    def pattern_ops_across_homes(self, count):
+        HOMES = ['G54', 'G55', 'G56', 'G57', 'G58', 'G59']
+        ncmds = []
+        idx = 0
+        while idx < len(self.commands):
+            if self.commands[idx].nc == 'G54':
+                for eidx in range(idx+1, len(self.commands)):
+                    if self.commands[eidx].nc == 'CYCLE800()':
+                        for hidx in range(count):
+                            routine = [cmd.copy() for cmd in self.commands[idx:eidx]]
+                            routine[0].words[0] = HOMES[hidx]
+                            ncmds.extend(routine)
+                        idx += len(routine)-1
+                        break
+                else:
+                    raise RuntimeError('failed to find end of routine')
+            else:
+                ncmds.append(self.commands[idx])
+            idx += 1
+        self.commands = ncmds
+
     def transform_for_dmu65ul(self):
         tool = None
         next_tool = None
